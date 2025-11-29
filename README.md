@@ -2,6 +2,8 @@
 
 # WSL2
 
+originally from https://github.com/cfenollosa/os-tutorial
+
 ## launch qemu under Windows while running WSL2
 
 qemu-system-x86_64.exe -s -S \\wsl.localhost\Debian\home\user\devel\os\build\os-image.bin -boot c
