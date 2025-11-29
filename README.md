@@ -2,20 +2,20 @@
 
 # WSL2
 
-## -- launch qemu under Windows while running WSL2
+## launch qemu under Windows while running WSL2
 
 qemu-system-x86_64.exe -s -S \\wsl.localhost\Debian\home\user\devel\os\build\os-image.bin -boot c
 
 * -s,-S  awaits a debugger 
 
 
-## --- Connect gdb debugger to qemu(on Windows)
+##  Connect gdb debugger to qemu(on Windows)
 
 ip route show | grep -i default | awk '{ print $3}'
 
 gdb	-ex "target remote 172.26.112.1:1234" -ex "symbol-file build/kernel.elf"
 
-## --- Compile with debug symbols ex:(hello.c)
+##  Compile with debug symbols ex:(hello.c)
 
 ```
 void dummy_test_entrypoint() {
@@ -55,7 +55,7 @@ Disassembly of section .text:
   1b:   c3                      ret
 ```
 
-## -- gdb commands
+## gdb commands
 
 
 Useful GDB commands
@@ -78,14 +78,14 @@ Useful GDB commands
 ---　\
 b main\
 continue\
-step\
+step
 
 ---\
 stepi\
 disassemble main\
 
 set {char}0xb8000 = 0x42\
-set {char}0xb8000 = 'G'\
+set {char}0xb8000 = 'G'
 
 whatis *video_memory\
 output: type = char
