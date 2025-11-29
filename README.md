@@ -59,35 +59,33 @@ Disassembly of section .text:
 
 
 Useful GDB commands\
-Command			Description\
-run (r)			Run the program until it finishes, crashes, or hits a breakpoint\
-start			Run and pause at the first line of main()\
-next (n)		Execute the next line (step over function calls)\
-step (s)		Execute the next line (step into function calls)\
-stepi 			Executes the next instcution\
-continue (c)	\
-				Resume execution until the next breakpoint or crash\
-break file.hh:N or b file.hh:N	\
-				Set a breakpoint at line N in file.hh\
-break func		Set a breakpoint at function func()\
-delete			Remove all breakpoints\
-print var or p var	\
-				Print the value of variable var\
-list (l)		Show source code around current line\
-info locals		Show all local variables\
-quit (q)		Exit GDB
+| Command | Description |
+| --- | --- |
+|run (r)|		|Run the program until it finishes, crashes, or hits a breakpoint|
+|start|			|Run and pause at the first line of main()|
+|next (n)		|Execute the next line (step over function calls)|
+|step (s)		|Execute the next line (step into function calls)|
+|stepi 			|Executes the next instcution|
+|continue (c)	|Resume execution until the next breakpoint or crash|
+|break file.hh:N or b file.hh:N	|Set a breakpoint at line N in file.hh|
+|break func		|Set a breakpoint at function func()|
+|delete			|Remove all breakpoints|
+|print var or p var	|Print the value of variable val|
+|list (l)		|Show source code around current line|
+|info locals	|Show all local variables|
+|quit (q)		|Exit GDB|
 
 ---　
 b main\
 continue\
-step 
+step \
 
 --
 stepi\
-disassemble main
+disassemble main\
 
 set {char}0xb8000 = 0x42\
-set {char}0xb8000 = 'G'
+set {char}0xb8000 = 'G'\
 
 whatis *video_memory\
 output: type = char
