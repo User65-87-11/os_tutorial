@@ -50,7 +50,7 @@ make_elf: $(BUILD_DIR)/kernel.elf
 	@echo "Make elf"
 
 debug: $(BUILD_DIR)/os-image.bin $(BUILD_DIR)/kernel.elf
-	gdb	-ex "target remote localhost:1234" -ex "symbol-file $(BUILD_DIR)/kernel.elf"
+	gdb	-ex "target remote 172.26.112.1:1234" -ex "symbol-file $(BUILD_DIR)/kernel.elf"
 
 rebuild:init clean 
 	@make
