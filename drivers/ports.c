@@ -6,8 +6,8 @@ unsigned char port_byte_in (unsigned short port) {
     /* Inline assembler syntax
      * !! Notice how the source and destination registers are switched from NASM !!
      *
-     * '"=a" (result)'; set '=' the C variable '(result)' to the value of register e'a'x
-     * '"d" (port)': map the C variable '(port)' into e'd'x register
+     * '"=a" (result)'; set '=' the C variable '(result)' to the value of register EAX
+     * '"d" (port)': map the C variable '(port)' into EDX register
      *
      * Inputs and outputs are separated by colons
      */

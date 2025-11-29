@@ -8,6 +8,11 @@ ASM_DIR = asm
 BK_DIR = build/kernel
 BD_DIR = build/drivers
 CFLAGS = -g
+
+
+objects= $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o $(BD_DIR)/ports.o
+
+
 .SILENT:make_objects
 
 #---------------
@@ -52,7 +57,7 @@ $(BUILD_DIR)/kernel_entry.o: $(ASM_DIR)/kernel_entry.asm
 	nasm $^ -f elf32 -o $@ 
 
 
-objects= $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o $(BD_DIR)/ports.o
+
 
 
 $(BUILD_DIR)/kernel.bin: $(objects)
