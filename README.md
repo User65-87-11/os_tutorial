@@ -58,11 +58,11 @@ Disassembly of section .text:
 ## -- gdb commands
 
 
-Useful GDB commands\
+Useful GDB commands
 | Command | Description |
 | --- | --- |
-|run (r)|		|Run the program until it finishes, crashes, or hits a breakpoint|
-|start|			|Run and pause at the first line of main()|
+|run (r)		|Run the program until it finishes, crashes, or hits a breakpoint|
+|start			|Run and pause at the first line of main()|
 |next (n)		|Execute the next line (step over function calls)|
 |step (s)		|Execute the next line (step into function calls)|
 |stepi 			|Executes the next instcution|
@@ -75,12 +75,12 @@ Useful GDB commands\
 |info locals	|Show all local variables|
 |quit (q)		|Exit GDB|
 
----　
+---　\
 b main\
 continue\
-step \
+step\
 
---
+---\
 stepi\
 disassemble main\
 
