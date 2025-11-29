@@ -9,11 +9,58 @@ int str_len(char * c);
 void set_cur_pos(int pos);
 void set_cur_xy(int x,int y);
 void print_string(char *c, int len);
+int itoa(int val,char * buff, int radix);//returns filled buffer and the new length
 
+
+char *test_c = "Test!";
+
+int itoa(int value,char * buff,int radix){
+	
+	int val;
+    int negative;
+    char buffer[64];
+    char *pos;
+    int digit;
+ 
+    if (value < 0 && radix == 10) {
+    	negative = 1;
+        val = -value;
+    } else {
+    	negative = 0;
+        val = value;
+    } /* if */
+ 
+    pos = &buffer[64];
+    *pos = '\0';
+ 
+    do {
+   	 	digit = val % radix;
+    	val = val / radix;
+    if (digit < 10) {
+        *--pos = '0' + digit;
+    } else {
+        *--pos = 'a' + digit - 10;
+    } /* if */
+    } while (val != 0L);
+ 
+    if (negative) {
+    *--pos = '-';
+    } /* if */
+
+	int num  = &buffer[64] - pos ;
+	for(int i=0;i< num; i++){
+		buff[i] = pos[i];
+	}
+ //   memcpy(string, pos, &buffer[64] - pos + 1);
+   // return string;
+	return num;
+}
 
 int str_len(char *c){
-	int l =0;
-	while(c[++l]!='\0');
+	int l = 0;
+	char *t = c;
+	while(*++t != '\0');
+	l  = t - c -1;
 	return l;
 }
 uint16_t get_cur_pos(){
@@ -77,7 +124,42 @@ void set_cur_xy(int x,int y){
 	port_byte_out(0x3D4, 0x0E);
 	port_byte_out(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
 }
-
+//fix me
+int search_mem(char * pattern , int start, int len){
+	char found = 0 ;
+	char * t = pattern;
+	int pattern_len = str_len(pattern);
+	int pos=0;
+	int temp_pen = 0;
+	for(char *i = (char*)start; (int)i < (start + len); i++)
+	{
+		if(*i == *t){
+			pos= (int)i;
+			found = 1;
+			temp_pen=1;
+			while(*++t!='\0'){
+				if(*t != *++i)
+				{
+					t = pattern;
+					found = 0;
+					i = (char *)pos;
+					break;
+				}
+				temp_pen++;
+			}
+			if(temp_pen !=pattern_len) {
+				t = pattern;
+				found = 0;
+				i = (char *)pos;
+				
+			}
+			if(found){
+				break;
+			}
+		}
+	}
+	return pos;
+}
 void main() {
 	clear_scr();
     /* Screen cursor position: ask VGA control register (0x3d4) for bytes
@@ -110,10 +192,31 @@ void main() {
     vga[offset_from_vga+1] = 0x0f; /* White text on black background */
 
 	set_cur_xy(0,0);
-	char hello_str[]="printf(\"Hello world\");";
+	char hello_str[]="Hello world!!!!!";
 	int len = str_len(hello_str);
 
+	char buff[10]={0};
+
+
 	print_string(hello_str,len);
+
+	char   search_str[6]={0};
+	search_str[0] = 'T';
+	search_str[1] = 'e';
+	search_str[2] = 's';
+	search_str[3] = 't';
+	search_str[4] = '!';
+	int mem_pos = search_mem(search_str,0,0x10000);
+
+	int len2 =itoa(mem_pos,buff,16);
+
 	print_string(hello_str,len);
-	 
+
+	print_string(buff,len2);
+	
+	print_string((char *)mem_pos,str_len((char *)mem_pos));
+
+ 
+ 
+
 }
