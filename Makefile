@@ -1,4 +1,6 @@
+
 BUILD_DIR = build
+TEMP_DIR = temp
 KERNEL_DIR = kernel
 DRIVER_DIR = drivers
 ASM_DIR = asm
@@ -11,6 +13,8 @@ CFLAGS = -g
 #---------------
 
 
+ 
+
 all: echos init build_all
 	
 	
@@ -19,7 +23,7 @@ build_all: $(BUILD_DIR)/bootsect.bin $(BUILD_DIR)/kernel.bin
 
 echos:
 	@echo "-----------BUILD------------"
-	@echo $(BK_DIR)
+
 clean:
 	@echo "-----------CLEAN------------"
 	rm -rf $(BUILD_DIR)/*
@@ -27,7 +31,8 @@ clean:
 init:
 	@echo "-----------INIT------------"
 	mkdir -p $(BK_DIR)
-	mkdir -p $(BK_DIR)
+	mkdir -p $(BD_DIR)
+
 
 
 $(BK_DIR)/kernel.o: $(KERNEL_DIR)/kernel.c
@@ -36,15 +41,26 @@ $(BK_DIR)/kernel.o: $(KERNEL_DIR)/kernel.c
 $(BK_DIR)/test.o: $(KERNEL_DIR)/test.c
 	gcc -m32 $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
+$(BD_DIR)/ports.o: $(DRIVER_DIR)/ports.c
+	gcc -m32 $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
+
+
+$(BUILD_DIR)/bootsect.bin: $(ASM_DIR)/boot_sect_main.asm
+	nasm $^ -f bin -o $@
 
 $(BUILD_DIR)/kernel_entry.o: $(ASM_DIR)/kernel_entry.asm
 	nasm $^ -f elf32 -o $@ 
 
-$(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o
-	ld  -Ttext 0x1000  -m elf_i386 --oformat binary -Map $(BUILD_DIR)/kernel_entry.map -o $@ $^
 
-$(BUILD_DIR)/kernel.elf: $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o
-	ld  -Ttext 0x1000  -m elf_i386  -o $@ $^
+objects= $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o $(BD_DIR)/ports.o
+
+
+$(BUILD_DIR)/kernel.bin: $(objects)
+	ld  -Ttext 0x1000  -m elf_i386 --oformat binary -Map $(BUILD_DIR)/kernel_entry.map -o $@ $^ 
+
+$(BUILD_DIR)/kernel.elf: $(objects)
+	ld -Ttext 0x1000 -m elf_i386 -o $@ $^  
+
 
 make_elf: $(BUILD_DIR)/kernel.elf
 	@echo "Make elf"
