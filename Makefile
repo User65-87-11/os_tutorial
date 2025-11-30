@@ -7,7 +7,8 @@ ASM_DIR = asm
 
 BK_DIR = build/kernel
 BD_DIR = build/drivers
-CFLAGS = -g -std=c23
+CFLAGS = -g -std=c23 -m32
+LD_FLAGS = -m elf_i386
 
 
 objects= $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o $(BD_DIR)/ports.o
@@ -41,13 +42,13 @@ init:
 
 
 $(BK_DIR)/kernel.o: $(KERNEL_DIR)/kernel.c
-	gcc -m32 $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
+	gcc $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
 $(BK_DIR)/test.o: $(KERNEL_DIR)/test.c
-	gcc -m32 $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
+	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
 $(BD_DIR)/ports.o: $(DRIVER_DIR)/ports.c
-	gcc -m32 $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
+	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
 
 $(BUILD_DIR)/bootsect.bin: $(ASM_DIR)/boot_sect_main.asm
@@ -61,13 +62,13 @@ $(BUILD_DIR)/kernel_entry.o: $(ASM_DIR)/kernel_entry.asm
 
 
 $(BUILD_DIR)/kernel.bin: $(objects)
-	ld  -Ttext 0x1000  -m elf_i386 --oformat binary -Map $(BUILD_DIR)/kernel_entry.map -o $@ $^ 
+	ld  -Ttext 0x1000  $(LD_FLAGS) --oformat binary -Map $(BUILD_DIR)/kernel_entry.map -o $@ $^ 
 
 $(BUILD_DIR)/kernel.elf: $(objects)
-	ld -Ttext 0x1000 -m elf_i386 -o $@ $^  
+	ld -Ttext 0x1000  $(LD_FLAGS) -o $@ $^  
 
 
-make_elf: $(BUILD_DIR)/kernel.elf
+elf: $(BUILD_DIR)/kernel.elf
 	@echo "Make elf"
 
 debug: $(BUILD_DIR)/os-image.bin $(BUILD_DIR)/kernel.elf

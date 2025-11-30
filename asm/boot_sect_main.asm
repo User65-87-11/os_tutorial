@@ -36,7 +36,7 @@ load_kernel:
     call print_nl
 
     mov bx, KERNEL_OFFSET ; Read from disk and store at 0x1000
-    mov dh, 6
+    mov dh, 17 ; -1
     mov dl, [BOOT_DRIVE]
  
     call disk_load
