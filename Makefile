@@ -4,6 +4,7 @@ TEMP_DIR = temp
 KERNEL_DIR = kernel
 DRIVER_DIR = drivers
 ASM_DIR = asm
+ZERO_FILE = build/zero_mb.dat
 
 BK_DIR = build/kernel
 BD_DIR = build/drivers
@@ -24,7 +25,7 @@ objects= $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o $(BD_DI
 all: echos init build_all
 	
 	
-build_all: $(BUILD_DIR)/bootsect.bin $(BUILD_DIR)/kernel.bin
+build_all: $(BUILD_DIR)/bootsect.bin $(BUILD_DIR)/kernel.bin $(ZERO_FILE)
 	cat $^ > $(BUILD_DIR)/os-image.bin
 
 echos:
@@ -38,6 +39,7 @@ init:
 	@echo "-----------INIT------------"
 	mkdir -p $(BK_DIR)
 	mkdir -p $(BD_DIR)
+	dd if=/dev/zero of=$(ZERO_FILE) bs=1MB count=1
 
 
 

@@ -3,6 +3,8 @@
 #define DRIVERS_SCREEN_IMPLEMENTATION
 #include "../drivers/screen.h"
 
+#define KERNEL_BYTES_IMPLEMENTATION
+#include "bytes.h"
 
 #include "types.h"
 
@@ -21,66 +23,66 @@ typedef unsigned short uint16_t ;
 // void put_char(char c,int pos);
 
 
-int cstr_len(char * c);
-void itoa(int val,char * buff, int radix);//returns filled buffer and the new length
-void zero_buff(char * c,int len);
-static char test_c[] = "findme";
+// int cstr_len(char * c);
+// void itoa(int val,char * buff, int radix);//returns filled buffer and the new length
+// void zero_buff(char * c,int len);
 
-void zero_buff(char * c,int len){
-	for(int i=0;i<len;i++)
-	{
-		c[i] = 0;
-	}
-}
-void itoa(int value,char * buff,int radix){
+
+// void zero_buff(char * c,int len){
+// 	for(int i=0;i<len;i++)
+// 	{
+// 		c[i] = 0;
+// 	}
+// }
+// void itoa(int value,char * buff,int radix){
 	
-	int val;
-    int negative;
-    char buffer[ITOA_BUFF_SIZE];
-    char *pos;
-    int digit;
+// 	int val;
+//     int negative;
+//     char buffer[ITOA_BUFF_SIZE];
+//     char *pos;
+//     int digit;
  
-    if (value < 0 && radix == 10) {
-    	negative = 1;
-        val = -value;
-    } else {
-    	negative = 0;
-        val = value;
-    } /* if */
+//     if (value < 0 && radix == 10) {
+//     	negative = 1;
+//         val = -value;
+//     } else {
+//     	negative = 0;
+//         val = value;
+//     } /* if */
  
-    pos = &buffer[ITOA_BUFF_SIZE];
-    *pos = '\0';
+//     pos = &buffer[ITOA_BUFF_SIZE];
+//     *pos = '\0';
  
-    do {
-   	 	digit = val % radix;
-    	val = val / radix;
-    if (digit < 10) {
-        *--pos = '0' + digit;
-    } else {
-        *--pos = 'a' + digit - 10;
-    } /* if */
-    } while (val != 0L);
+//     do {
+//    	 	digit = val % radix;
+//     	val = val / radix;
+//     if (digit < 10) {
+//         *--pos = '0' + digit;
+//     } else {
+//         *--pos = 'a' + digit - 10;
+//     } /* if */
+//     } while (val != 0L);
  
-    if (negative) {
-    *--pos = '-';
-    } /* if */
+//     if (negative) {
+//     *--pos = '-';
+//     } /* if */
 
-	int num  = &buffer[ITOA_BUFF_SIZE] - pos ;
-	for(int i=0;i< num; i++){
-		buff[i] = pos[i];
-	}
- //   memcpy(string, pos, &buffer[64] - pos + 1);
-   // return string;
+// 	int num  = &buffer[ITOA_BUFF_SIZE] - pos ;
+// 	for(int i=0;i< num; i++){
+// 		buff[i] = pos[i];
+// 	}
+//  //   memcpy(string, pos, &buffer[64] - pos + 1);
+//    // return string;
 	 
-}
+// }
 
-int cstr_len(char *c){
-	int l = 0;
-	char *t = c;
-	while(*++t != '\0');
-	l  = t - c -1;
-	return l;
-}
+// int cstr_len(char *c){
+// 	int l = 0;
+// 	char *t = c;
+// 	while(*++t != '\0');
+// 	l  = t - c -1;
+// 	return l;
+// }
 // uint16_t get_cur_pos(){
 
 // 	port_byte_out(0x3d4, 14); /* Requesting byte 14: high byte of cursor pos */
@@ -301,7 +303,7 @@ void main() {
 	char test[]="findme"; //finds this
 	int mem_pos = search_mem(test,5, 0x0, 0x100000);
 	
-	test_c[0] ='a';
+
 	
 	// print_cstring(new_line);
 	itoa(mem_pos,buff,16);
