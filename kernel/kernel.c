@@ -4,21 +4,30 @@ typedef unsigned char uint8_t ;
 typedef unsigned short uint16_t ;
 #define VGA_WIDTH  80
 #define VGA_HEIGHT  25
+#define ITOA_BUFF_SIZE 14
 
-int str_len(char * c);
+int cstr_len(char * c);
 void set_cur_pos(int pos);
 void set_cur_xy(int x,int y);
-void print_string(char *c, int len);
-int itoa(int val,char * buff, int radix);//returns filled buffer and the new length
-
+void print_cstring(char *c);
+void print_cstring_at(char *s,int x,int y);
+void itoa(int val,char * buff, int radix);//returns filled buffer and the new length
+void scroll();
+void zero_buff(char * c,int len);
 
 char *test_c = "Test!";
 
-int itoa(int value,char * buff,int radix){
+void zero_buff(char * c,int len){
+	for(int i=0;i<len;i++)
+	{
+		c[i] = 0;
+	}
+}
+void itoa(int value,char * buff,int radix){
 	
 	int val;
     int negative;
-    char buffer[64];
+    char buffer[ITOA_BUFF_SIZE];
     char *pos;
     int digit;
  
@@ -30,7 +39,7 @@ int itoa(int value,char * buff,int radix){
         val = value;
     } /* if */
  
-    pos = &buffer[64];
+    pos = &buffer[ITOA_BUFF_SIZE];
     *pos = '\0';
  
     do {
@@ -47,16 +56,18 @@ int itoa(int value,char * buff,int radix){
     *--pos = '-';
     } /* if */
 
-	int num  = &buffer[64] - pos ;
+	int num  = &buffer[ITOA_BUFF_SIZE] - pos ;
 	for(int i=0;i< num; i++){
 		buff[i] = pos[i];
 	}
  //   memcpy(string, pos, &buffer[64] - pos + 1);
    // return string;
-	return num;
+	 
 }
+void print_direct(char * c){
 
-int str_len(char *c){
+}
+int cstr_len(char *c){
 	int l = 0;
 	char *t = c;
 	while(*++t != '\0');
@@ -80,21 +91,35 @@ void put_char(char c, uint16_t pos ){
 	vga[pos*2] = c;
 	vga[pos*2 + 1] = 0x0e;
 }
-void print_string(char * s,int len){
+void print_cstring_at(char *s,int x,int y){
+	int pos = y*VGA_WIDTH + x;
+	while(*s !='\0'){
+		put_char(*s++,pos++);
+	}
+}
+void print_cstring(char * s){
 	uint16_t cur = get_cur_pos();
 	
-	for(int i=0; i<len;i++)
+	while(*s!='\0')
 	{
 		if(cur < VGA_WIDTH * VGA_HEIGHT)
 		{
-			put_char(s[i],cur);
+
+			
+			if(*s == '\n'){
+				
+				cur = cur + (VGA_WIDTH - (cur % VGA_WIDTH))  - 1;
+			}
+			else{
+				put_char(*s,cur);
+			}
+
+			
 			cur ++;
-			set_cur_pos(cur);
-			
-			// cur = get_cur_pos();
-			
+			s++;	
 		}
 	}
+	set_cur_pos(cur);
 }
 
 void clear_scr(){
@@ -119,41 +144,57 @@ void set_cur_pos(int pos){
 void set_cur_xy(int x,int y){
 	uint16_t pos = y * VGA_WIDTH + x;
 
-	port_byte_out(0x3D4, 0x0F);
+	port_byte_out(0x3D4, 0x0F); // low
 	port_byte_out(0x3D5, (uint8_t) (pos & 0xFF));
-	port_byte_out(0x3D4, 0x0E);
+	port_byte_out(0x3D4, 0x0E); //high
 	port_byte_out(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
 }
+
 //fix me
-int search_mem(char * pattern , int start, int len){
-	char found = 0 ;
+int search_cstr(char * str,int lensearch,char*bytes, int lenkey){
+	char *a;
+	char *b;
+	bool found = false;
+	int j = -1;
+	if(lensearch < lenkey) {
+
+		return j;
+	}
+	
+	for(j = 0; j < lensearch; j++)
+	{
+		if(str[j] == *bytes){
+			found = true;
+			for(int i=1; i < lenkey; i++){
+				a = str+j+i;
+				b = bytes + i;
+				if(*a != *b){
+					found= false;
+					break;
+				}
+			}
+			if(found){
+				break;
+			}
+		}
+	}
+	if(found == false)
+	{
+		j = -1;
+	}
+	return j;
+}
+int search_mem(char * pattern, int p_len ,int start, int len){
+	bool found = false ;
 	char * t = pattern;
-	int pattern_len = str_len(pattern);
-	int pos=0;
-	int temp_pen = 0;
+	int pos=-1;
+
 	for(char *i = (char*)start; (int)i < (start + len); i++)
 	{
 		if(*i == *t){
-			pos= (int)i;
-			found = 1;
-			temp_pen=1;
-			while(*++t!='\0'){
-				if(*t != *++i)
-				{
-					t = pattern;
-					found = 0;
-					i = (char *)pos;
-					break;
-				}
-				temp_pen++;
-			}
-			if(temp_pen !=pattern_len) {
-				t = pattern;
-				found = 0;
-				i = (char *)pos;
-				
-			}
-			if(found){
+			pos = search_cstr(i,p_len,t,p_len);
+			if(pos != -1){
+				pos+=(int)i;
 				break;
 			}
 		}
@@ -162,6 +203,7 @@ int search_mem(char * pattern , int start, int len){
 }
 void main() {
 	clear_scr();
+	set_cur_pos(0);
     /* Screen cursor position: ask VGA control register (0x3d4) for bytes
      * 14 = high byte of cursor and 15 = low byte of cursor. */
     port_byte_out(0x3d4, 14); /* Requesting byte 14: high byte of cursor pos */
@@ -192,13 +234,34 @@ void main() {
     vga[offset_from_vga+1] = 0x0f; /* White text on black background */
 
 	set_cur_xy(0,0);
-	char hello_str[]="Hello world!!!!!";
-	int len = str_len(hello_str);
+	char hello_str[]="Hello world!!!!!\n";
+	int hello_str_len = cstr_len(hello_str);
+	char search_pat[] ="world";
+	int search_pat_len = cstr_len(search_pat);
+	
 
-	char buff[10]={0};
+	char hello_str1[]="12345";
+	char new_line[]="\n";
+	int hello_str1_len = cstr_len(hello_str);
+
+	char buff[ITOA_BUFF_SIZE]={0};
 
 
-	print_string(hello_str,len);
+
+	print_cstring(hello_str);
+	print_cstring(hello_str);
+	print_cstring(hello_str);
+
+	int find = search_cstr(
+		hello_str,
+		hello_str_len,
+		search_pat,
+		search_pat_len);
+
+	itoa(find,buff,10);
+	print_cstring(buff);
+	print_cstring(new_line);
+	
 
 	char   search_str[6]={0};
 	search_str[0] = 'T';
@@ -206,17 +269,33 @@ void main() {
 	search_str[2] = 's';
 	search_str[3] = 't';
 	search_str[4] = '!';
-	int mem_pos = search_mem(search_str,0,0x10000);
 
-	int len2 =itoa(mem_pos,buff,16);
-
-	print_string(hello_str,len);
-
-	print_string(buff,len2);
+	char * c = (char*)0x10000;
+	c[0] = 'T';
+	c[1] = 'e';
+	c[2] = 's';
+	c[3] = 't';
 	
-	print_string((char *)mem_pos,str_len((char *)mem_pos));
 
+	int mem_pos = search_mem(c,4, 0, 0x100000);
+	
+	if(mem_pos == -1)
+		mem_pos = 0;
+	
+	// print_cstring(new_line);
+	itoa(mem_pos,buff,16);
+
+	print_cstring(buff);
+	print_cstring(new_line);
+
+	// print_cstring(buff);
+	
+	// print_cstring_at(buff,0,0);
+
+	// zero_buff(buff,ITOA_BUFF_SIZE);
+
+	// len2 =itoa(len2,buff,16);
  
- 
+	// print_cstring_at(buff,0,1);
 
 }

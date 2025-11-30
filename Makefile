@@ -7,7 +7,7 @@ ASM_DIR = asm
 
 BK_DIR = build/kernel
 BD_DIR = build/drivers
-CFLAGS = -g
+CFLAGS = -g -std=c23
 
 
 objects= $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o $(BD_DIR)/ports.o
