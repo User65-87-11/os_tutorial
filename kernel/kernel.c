@@ -262,22 +262,17 @@ void main() {
 	print_cstring(buff);
 	print_cstring(new_line);
 	
-
-	char   search_str[6]={0};
-	search_str[0] = 'T';
-	search_str[1] = 'e';
-	search_str[2] = 's';
-	search_str[3] = 't';
-	search_str[4] = '!';
+	char empty []= "Empty!";
 
 	char * c = (char*)0x10000;
 	c[0] = 'T';
 	c[1] = 'e';
 	c[2] = 's';
 	c[3] = 't';
+	c[4] = '\0';
 	
-
-	int mem_pos = search_mem(c,4, 0, 0x100000);
+	char test[]="Test"; //finds this
+	int mem_pos = search_mem(test,5, 0x10001, 0x100000);
 	
 	if(mem_pos == -1)
 		mem_pos = 0;
@@ -285,10 +280,22 @@ void main() {
 	// print_cstring(new_line);
 	itoa(mem_pos,buff,16);
 
+	
 	print_cstring(buff);
 	print_cstring(new_line);
+	if(mem_pos > 0)
+	{
+	
+		((char*)mem_pos)[0]='E';
+	
+		print_cstring((char*)mem_pos);
+	}
+	else{
+		print_cstring(empty);
+	}
 
-	// print_cstring(buff);
+		print_cstring(new_line);
+	print_cstring(test);
 	
 	// print_cstring_at(buff,0,0);
 
