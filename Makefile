@@ -8,11 +8,12 @@ ZERO_FILE = build/zero_mb.dat
 
 BK_DIR = build/kernel
 BD_DIR = build/drivers
+BA_DIR = build/asm
 CFLAGS = -g -std=c23 -m32
 LD_FLAGS = -m elf_i386
 
 
-objects= $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o $(BD_DIR)/ports.o
+objects= $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o $(BD_DIR)/ports.o $(BUILD_DIR)/asm/32bit-mem.o
 
 
 .SILENT:make_objects
@@ -39,6 +40,7 @@ init:
 	@echo "-----------INIT------------"
 	mkdir -p $(BK_DIR)
 	mkdir -p $(BD_DIR)
+	mkdir -p $(BA_DIR)
 	dd if=/dev/zero of=$(ZERO_FILE) bs=1MB count=1
 
 
@@ -53,15 +55,17 @@ $(BD_DIR)/ports.o: $(DRIVER_DIR)/ports.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
 
+# -------asm
 $(BUILD_DIR)/bootsect.bin: $(ASM_DIR)/boot_sect_main.asm
 	nasm $^ -f bin -o $@
 
 $(BUILD_DIR)/kernel_entry.o: $(ASM_DIR)/kernel_entry.asm
 	nasm $^ -f elf32 -o $@ 
 
+$(BUILD_DIR)/asm/32bit-mem.o: $(ASM_DIR)/32bit-mem.asm
+	nasm $^ -f elf32 -o $@ 
 
-
-
+# -------
 
 $(BUILD_DIR)/kernel.bin: $(objects)
 	ld  -Ttext 0x1000  $(LD_FLAGS) --oformat binary -Map $(BUILD_DIR)/kernel_entry.map -o $@ $^ 

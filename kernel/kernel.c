@@ -10,9 +10,9 @@
 
 typedef unsigned char uint8_t ;
 typedef unsigned short uint16_t ;
-#define VGA_WIDTH  80
-#define VGA_HEIGHT  25
-#define ITOA_BUFF_SIZE 14
+// #define VGA_WIDTH  80
+// #define VGA_HEIGHT  25
+
 
 
 // void set_cur_pos(int pos);
@@ -273,7 +273,7 @@ void main() {
 	char new_line[]="\n";
 	int hello_str1_len = cstr_len(hello_str);
 
-	char buff[ITOA_BUFF_SIZE]={0};
+	char buff[10]={0};
 
 
 
@@ -349,5 +349,22 @@ void main() {
 	// len2 =itoa(len2,buff,16);
  
 	// print_cstring_at(buff,0,1);
+	int len = 80*2*25;
+	char zero[80*2*25 ]  = {};
+	rep_stosb(zero,'a',len);
+	// memset(zero,80*2*25,'a');
+	// for(int i=0; i< 80*25;i++){
+	// 	zero[i*2 + 1] = 0x0f;
+	// }
+	// itoa((int)&zero[0],buff,16);
+	// rep_movsb(vga,zero,len);
+	// vga[0] = 'b';
+	// vga[1*2] = 'b';
+	// vga[1*2+1] = 0x0f;
+	// vga[2*2] = 'b';
+	// vga[2*2+1] = 0x0f;
+	//print_cstring(new_line);
+	//print_cstring(buff);
+	//print_cstring(new_line);
 
 }

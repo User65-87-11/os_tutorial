@@ -93,9 +93,9 @@ void clear_scr(){
 	char *vga = (char*)0xb8000;
 
 
-	for(int i=0;i< VGA_WIDTH * VGA_HEIGHT * 2 ;i+=2){
-		vga[i] = '\0';
-		vga[i+1] = 0x0f;
+	for(int i=0;i< VGA_WIDTH * VGA_HEIGHT  ;i++){
+		vga[i*2] = '\0';
+		vga[i*2+1] = 0x0f;
 		
 	}
 }

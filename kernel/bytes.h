@@ -4,15 +4,18 @@
 
 int cstr_len(char * c);
 void itoa(int val,char * buff, int radix);//returns filled buffer and the new length
-void zero_buff(char * c,int len);
+void memset(char * c,int len, char val);
+
+extern  void rep_movsb(char *dst,char *src,int num);
+extern  void rep_stosb(char *dst,char byte,int num);
 
 
 #ifdef KERNEL_BYTES_IMPLEMENTATION
 
-void zero_buff(char * c,int len){
+void memset(char * c,int len, char val){
 	for(int i=0;i<len;i++)
 	{
-		c[i] = 0;
+		c[i] = val;
 	}
 }
 
