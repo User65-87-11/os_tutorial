@@ -1,6 +1,9 @@
 #pragma once
-#include "../cpu/types.h"
+
 #include "../kernel/bytes.h"
+
+
+
 
 #define VGA_WIDTH  80
 #define VGA_HEIGHT  25
@@ -8,7 +11,7 @@
 
 
 void set_cur_xy(int x,int y);
-uint16_t get_cur_pos();;
+unsigned short get_cur_pos();;
 void print_memory(int addr, int len);
 void put_char(char c, int pos );
 void print_cstring_at(char *s,int x,int y);
@@ -75,7 +78,7 @@ void scroll_by_v2(int y){
 }
 
 void scroll_by(int y){
-	uint16_t VGA_BUFF[VGA_WIDTH*VGA_HEIGHT] = {};
+	unsigned short VGA_BUFF[VGA_WIDTH*VGA_HEIGHT] = {};
 	y = y % VGA_HEIGHT;
 	if( y == 0 ) return;
 	bool up = true;
@@ -84,7 +87,7 @@ void scroll_by(int y){
 		up = false;
 		y = y * -1;
 	}
-	uint16_t pos =	get_cur_pos();
+	unsigned short pos =	get_cur_pos();
  
 	int offset = y * VGA_WIDTH * 2;
 	
@@ -113,15 +116,13 @@ void scroll_by(int y){
 	}
 	set_cur_pos(pos);
 }
-inline uint16_t get_cur_pos_y(uint16_t pos){
 
-	return pos / VGA_WIDTH ;
-}
-uint16_t get_cur_pos(){
+
+unsigned short get_cur_pos(){
 
 	port_byte_out(0x3d4, 14); /* Requesting byte 14: high byte of cursor pos */
     /* Data is returned in VGA data register (0x3d5) */
-    uint16_t position = port_byte_in(0x3d5);
+    unsigned short position = port_byte_in(0x3d5);
     position = position << 8; /* high byte */
 
     port_byte_out(0x3d4, 15); /* requesting low byte */
@@ -161,7 +162,7 @@ void print_cstring_at(char *s,int x,int y){
 	}
 }
 void print_cstring(char * s){
-	uint16_t cur = get_cur_pos();
+	unsigned short cur = get_cur_pos();
 	
 	while(*s!='\0')
 	{
@@ -200,16 +201,16 @@ void set_cur_pos(int pos){
 	//uint16_t pos = y * VGA_WIDTH + x;
 
 	port_byte_out(0x3D4, 0x0F);
-	port_byte_out(0x3D5, (uint8_t) (pos & 0xFF));
+	port_byte_out(0x3D5, (unsigned char) (pos & 0xFF));
 	port_byte_out(0x3D4, 0x0E);
-	port_byte_out(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
+	port_byte_out(0x3D5, (unsigned char) ((pos >> 8) & 0xFF));
 }
 void set_cur_xy(int x,int y){
-	uint16_t pos = y * VGA_WIDTH + x;
+	unsigned short pos = y * VGA_WIDTH + x;
 
 	port_byte_out(0x3D4, 0x0F); // low
-	port_byte_out(0x3D5, (uint8_t) (pos & 0xFF));
+	port_byte_out(0x3D5, (unsigned char) (pos & 0xFF));
 	port_byte_out(0x3D4, 0x0E); //high
-	port_byte_out(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
+	port_byte_out(0x3D5, (unsigned char) ((pos >> 8) & 0xFF));
 }
 #endif

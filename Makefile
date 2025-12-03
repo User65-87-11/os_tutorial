@@ -4,16 +4,23 @@ TEMP_DIR = temp
 KERNEL_DIR = kernel
 DRIVER_DIR = drivers
 ASM_DIR = asm
+CPU_DIR = cpu
 ZERO_FILE = build/zero_mb.dat
 
 BK_DIR = build/kernel
 BD_DIR = build/drivers
+BCPU_DIR = build/cpu
 BA_DIR = build/asm
 CFLAGS = -g -std=c23 -m32
 LD_FLAGS = -m elf_i386
 
 
-objects= $(BUILD_DIR)/kernel_entry.o $(BK_DIR)/kernel.o $(BK_DIR)/test.o $(BD_DIR)/ports.o $(BUILD_DIR)/asm/32bit-mem.o
+objects= $(BUILD_DIR)/kernel_entry.o \
+		$(BK_DIR)/kernel.o \
+		$(BK_DIR)/test.o \
+		$(BD_DIR)/ports.o \
+		$(BUILD_DIR)/asm/32bit-mem.o\
+		$(BCPU_DIR)/idt.o $(BCPU_DIR)/isr.o $(BCPU_DIR)/interrupt.o
 
 
 .SILENT:make_objects
@@ -41,6 +48,7 @@ init:
 	mkdir -p $(BK_DIR)
 	mkdir -p $(BD_DIR)
 	mkdir -p $(BA_DIR)
+	mkdir -p $(BCPU_DIR)
 	dd if=/dev/zero of=$(ZERO_FILE) bs=1MB count=1
 
 
@@ -55,6 +63,18 @@ $(BD_DIR)/ports.o: $(DRIVER_DIR)/ports.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
 
+# --- IDT
+$(BCPU_DIR)/idt.o: $(CPU_DIR)/idt.c
+	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
+
+$(BCPU_DIR)/isr.o : $(CPU_DIR)/isr.c
+	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
+
+$(BCPU_DIR)/interrupt.o: $(CPU_DIR)/interrupt.asm
+	nasm $^ -f elf32 -o $@ 	
+
+
+
 # -------asm
 $(BUILD_DIR)/bootsect.bin: $(ASM_DIR)/boot_sect_main.asm
 	nasm $^ -f bin -o $@
@@ -65,10 +85,12 @@ $(BUILD_DIR)/kernel_entry.o: $(ASM_DIR)/kernel_entry.asm
 $(BUILD_DIR)/asm/32bit-mem.o: $(ASM_DIR)/32bit-mem.asm
 	nasm $^ -f elf32 -o $@ 
 
+
+
 # -------
 
 $(BUILD_DIR)/kernel.bin: $(objects)
-	ld  -Ttext 0x1000  $(LD_FLAGS) --oformat binary -Map $(BUILD_DIR)/kernel_entry.map -o $@ $^ 
+	ld  -Ttext 0x1000  $(LD_FLAGS) --oformat binary  -o $@ $^ 
 
 $(BUILD_DIR)/kernel.elf: $(objects)
 	ld -Ttext 0x1000  $(LD_FLAGS) -o $@ $^  
@@ -82,23 +104,4 @@ debug: $(BUILD_DIR)/os-image.bin $(BUILD_DIR)/kernel.elf
 
 rebuild:init clean 
 	@make
-
-# ---------------------------------------------------
-# kernel_:
-# 	@echo "[= Target kernel =]" 
-# 	rm -f bootsect.bin kernel.bin os-image.bin disk.img
-
-# 	gcc -m32 -ffreestanding -fno-pie -c ./kernel/kernel.c -o ./tmp/kernel.o
-# 	nasm ./asm/kernel_entry.asm -f elf32 -o ./tmp/kernel_entry.o
-
-
-# 	ld  -Ttext 0x1000  -m elf_i386 --oformat binary -Map map.map -o kernel.bin ./tmp/kernel_entry.o ./tmp/kernel.o
-
-# 	ld  -Ttext 0x1000  -m elf_i386 -Map map.map -o kernel.elf ./tmp/kernel_entry.o ./tmp/kernel.o
-
-# 	objcopy -O binary kernel.elf kernel.elf.bin
-# 	nasm ./asm/boot_sect_main.asm -f bin -o bootsect.bin
-# 	cat bootsect.bin  kernel.bin > os-image.bin
-# 	cat bootsect.bin  kernel.elf.bin > os-image.elf.bin
-
 

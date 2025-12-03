@@ -1,6 +1,5 @@
-#ifndef ISR_H
-#define ISR_H
-
+#pragma once
+ 
 #include "types.h"
 
 /* ISRs reserved for CPU exceptions */
@@ -48,4 +47,4 @@ typedef struct {
 void isr_install();
 void isr_handler(registers_t r);
 
-#endif
+ 

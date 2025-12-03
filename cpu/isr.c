@@ -1,7 +1,9 @@
 #include "isr.h"
 #include "idt.h"
+
 #include "../drivers/screen.h"
-#include "../kernel/util.h"
+#include "../kernel/bytes.h"
+// #include "../kernel/util.h"
 
 /* Can't do this with a loop because we need the address
  * of the function names */
@@ -82,11 +84,11 @@ char *exception_messages[] = {
 };
 
 void isr_handler(registers_t r) {
-    kprint("received interrupt: ");
-    char s[3];
-    int_to_ascii(r.int_no, s);
-    kprint(s);
-    kprint("\n");
-    kprint(exception_messages[r.int_no]);
-    kprint("\n");
+    print_cstring("received interrupt: ");
+    char s[10];
+    itoa(r.int_no, s,10);
+    print_cstring(s);
+    print_cstring("\n");
+    print_cstring(exception_messages[r.int_no]);
+    print_cstring("\n");
 }

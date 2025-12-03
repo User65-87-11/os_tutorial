@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+// #include "types.h"
 
 
 int cstr_len(char * c);
@@ -39,7 +39,56 @@ void memset(char * c,int len, char val){
 		c[i] = val;
 	}
 }
+int search_array(char * str,int lensearch,char*bytes, int lenkey){
+	char *a;
+	char *b;
+	bool found = false;
+	int j = -1;
+	if(lensearch < lenkey) {
 
+		return j;
+	}
+	
+	for(j = 0; j < lensearch; j++)
+	{
+		if(str[j] == *bytes){
+			found = true;
+			for(int i=1; i < lenkey; i++){
+				a = str+j+i;
+				b = bytes + i;
+				if(*a != *b){
+					found= false;
+					break;
+				}
+			}
+			if(found){
+				break;
+			}
+		}
+	}
+	if(found == false)
+	{
+		j = -1;
+	}
+	return j;
+}
+int search_mem(char * pattern, int p_len ,int start, int len){
+	bool found = false ;
+	char * t = pattern;
+	int pos=-1;
+
+	for(char *i = (char*)start; (int)i < (start + len); i++)
+	{
+		if(*i == *t){
+			pos = search_array(i,p_len,t,p_len);
+			if(pos != -1){
+				pos+=(int)i;
+				break;
+			}
+		}
+	}
+	return pos;
+}
 
 /* 
 buffer the size of #define ITOA_BUFF_SIZE 14
