@@ -1,8 +1,11 @@
 #pragma once
-#include "../kernel/types.h"
+#include "../cpu/types.h"
+#include "../kernel/bytes.h"
 
 #define VGA_WIDTH  80
 #define VGA_HEIGHT  25
+
+
 
 void set_cur_xy(int x,int y);
 uint16_t get_cur_pos();;
@@ -13,14 +16,107 @@ void print_cstring(char * s);
 void clear_scr();
 void set_cur_pos(int pos);
 void set_cur_xy(int x,int y);
+void scroll_by(int y);
+void scroll_by_v2(int y);
 
 
 
 #ifdef DRIVERS_SCREEN_IMPLEMENTATION
 
+char *VGA_MEM = (char*)0xb8000;
+
+void scroll_by_v2(int y){
+	char buffer[VGA_WIDTH*VGA_HEIGHT*2] = {};
+
+ 
+
+	if( y == 0 ) return;
+	if( y > VGA_HEIGHT)
+	{
+		y = VGA_HEIGHT;
+	}else if(y + VGA_HEIGHT < 0)
+	{
+		y= -VGA_HEIGHT;
+	}
+	bool up = true;
+	int pos =	get_cur_pos() - y*VGA_WIDTH;
+	if(y < 0)
+	{
+		up = false;
+		y = y * -1;
+	}
+	rep_movsb$loc(buffer,VGA_MEM,VGA_WIDTH*VGA_HEIGHT * 2);
+	clear_scr();
+	int offset = y * 2 * VGA_WIDTH;
+	int num = VGA_WIDTH*VGA_HEIGHT * 2 - offset;
+	
+	 
+
+	if(up){
+		rep_movsb$loc(VGA_MEM,&buffer[offset],num);
+		 
+	}else
+	{
+		rep_movsb$loc(&VGA_MEM[offset],buffer,num);
+	}
+
+		
 
 
+	if(pos < 0)
+	{
+		pos = 0;
+	}
+	else if( pos >= VGA_WIDTH * VGA_HEIGHT)
+	{
+			pos = VGA_WIDTH * VGA_HEIGHT - 1;
+	}
+	set_cur_pos(pos);
+}
 
+void scroll_by(int y){
+	uint16_t VGA_BUFF[VGA_WIDTH*VGA_HEIGHT] = {};
+	y = y % VGA_HEIGHT;
+	if( y == 0 ) return;
+	bool up = true;
+	if(y < 0)
+	{
+		up = false;
+		y = y * -1;
+	}
+	uint16_t pos =	get_cur_pos();
+ 
+	int offset = y * VGA_WIDTH * 2;
+	
+
+	if(up)
+	{		int num = VGA_WIDTH * VGA_HEIGHT * 2 - offset ;
+			rep_movsb(VGA_MEM,VGA_MEM + offset,num);//normal
+			pos = pos -  (y)*VGA_WIDTH ;
+	}else
+	{
+			int num =  offset ;
+			rep_movsb(VGA_MEM + offset ,VGA_MEM ,num);
+			pos = pos +  (y)*VGA_WIDTH ;
+	}
+
+
+	
+	
+	if(pos < 0)
+	{
+		pos = 0;
+	}
+	else if( pos >= VGA_WIDTH * VGA_HEIGHT)
+	{
+			pos = VGA_WIDTH * VGA_HEIGHT - 1;
+	}
+	set_cur_pos(pos);
+}
+inline uint16_t get_cur_pos_y(uint16_t pos){
+
+	return pos / VGA_WIDTH ;
+}
 uint16_t get_cur_pos(){
 
 	port_byte_out(0x3d4, 14); /* Requesting byte 14: high byte of cursor pos */

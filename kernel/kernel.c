@@ -1,9 +1,13 @@
+#define KERNEL_BYTES_IMPLEMENTATION
+#define DRIVERS_SCREEN_IMPLEMENTATION
+
+
 #include "../drivers/ports.h"
 
-#define DRIVERS_SCREEN_IMPLEMENTATION
+
 #include "../drivers/screen.h"
 
-#define KERNEL_BYTES_IMPLEMENTATION
+
 #include "bytes.h"
 
 #include "types.h"
@@ -233,138 +237,146 @@ int search_mem(char * pattern, int p_len ,int start, int len){
 void main() {
 	clear_scr();
 	set_cur_pos(0);
-    /* Screen cursor position: ask VGA control register (0x3d4) for bytes
-     * 14 = high byte of cursor and 15 = low byte of cursor. */
-    port_byte_out(0x3d4, 14); /* Requesting byte 14: high byte of cursor pos */
-    /* Data is returned in VGA data register (0x3d5) */
-    int position = port_byte_in(0x3d5);
-    position = position << 8; /* high byte */
-
-    port_byte_out(0x3d4, 15); /* requesting low byte */
-    position += port_byte_in(0x3d5);
-
-    /* VGA 'cells' consist of the character and its control data
-     * e.g. 'white on black background', 'red text on white bg', etc */
-    int offset_from_vga = position * 2;
-
-    /* Now you can examine both variables using gdb, since we still
-     * don't know how to print strings on screen. Run 'make debug' and
-     * on the gdb console:
-     * breakpoint kernel.c:21
-     * continue
-     * print position
-     * print offset_from_vga
-     */
-
-    /* Let's write on the current cursor position, we already know how
-     * to do that */
-    char *vga = (char*)0xb8000;
-    vga[offset_from_vga] = 'X'; 
-    vga[offset_from_vga+1] = 0x0f; /* White text on black background */
-
-	set_cur_xy(0,0);
-	char hello_str[]="Hello world!!!!!\n";
-	int hello_str_len = cstr_len(hello_str);
-	char search_pat[] ="world";
-	int search_pat_len = cstr_len(search_pat);
-	
-
-	char hello_str1[]="12345";
-	char new_line[]="\n";
-	int hello_str1_len = cstr_len(hello_str);
-
-	char buff[10]={0};
-
-
-
-	print_cstring(hello_str);
-	print_cstring(hello_str);
-	print_cstring(hello_str);
-
-	int find = search_array(
-		hello_str,
-		hello_str_len,
-		search_pat,
-		search_pat_len);
-
-	itoa(find,buff,10);
-	print_cstring(buff);
-	print_cstring(new_line);
-	
-	char empty []= "Empty!";
-
-	char * c = (char*)0x10000;
-	c[0] = 'T';
-	c[1] = 'e';
-	c[2] = 's';
-	c[3] = 't';
-	c[4] = '\0';
-	
-	char test[]="findme"; //finds this
-	int mem_pos = search_mem(test,5, 0x0, 0x100000);
-	
-
-	
-	// print_cstring(new_line);
-	itoa(mem_pos,buff,16);
-
-	
-	print_cstring(buff);
-	print_cstring(new_line);
-	print_cstring(test);
-	print_cstring(new_line);
-	print_cstring(test);
-	if(mem_pos >= 0)
-	{
-	
-		//((char*)mem_pos)[0]='E';
-	
-		print_cstring(new_line);
-		print_cstring((char*)mem_pos);
-	}
-	else{
-		print_cstring(empty);
-	}
-
-	print_cstring(new_line);
-	print_cstring("findme");
-	print_cstring(new_line);
-
-	print_memory(0x8ff82,64);
-
-	// print_cstring(new_line);
-	// itoa(mem_pos,buff,16);
-
-	// print_cstring(buff);
-
-	// print_cstring("testa");
-	
-	// print_cstring("testc");
-	//print_cstring(test);
-	
-	// print_cstring_at(buff,0,0);
-
-	// zero_buff(buff,ITOA_BUFF_SIZE);
-
-	// len2 =itoa(len2,buff,16);
- 
-	// print_cstring_at(buff,0,1);
-	int len = 80*2*25;
-	char zero[80*2*25 ]  = {};
-	rep_stosb(zero,'a',len);
-	// memset(zero,80*2*25,'a');
-	// for(int i=0; i< 80*25;i++){
-	// 	zero[i*2 + 1] = 0x0f;
-	// }
-	// itoa((int)&zero[0],buff,16);
-	// rep_movsb(vga,zero,len);
-	// vga[0] = 'b';
-	// vga[1*2] = 'b';
-	// vga[1*2+1] = 0x0f;
-	// vga[2*2] = 'b';
-	// vga[2*2+1] = 0x0f;
-	//print_cstring(new_line);
-	//print_cstring(buff);
-	//print_cstring(new_line);
+	print_cstring("Hello, World!");
 
 }
+// void main1() {
+// 	clear_scr();
+// 	set_cur_pos(0);
+//     /* Screen cursor position: ask VGA control register (0x3d4) for bytes
+//      * 14 = high byte of cursor and 15 = low byte of cursor. */
+//     port_byte_out(0x3d4, 14); /* Requesting byte 14: high byte of cursor pos */
+//     /* Data is returned in VGA data register (0x3d5) */
+//     int position = port_byte_in(0x3d5);
+//     position = position << 8; /* high byte */
+
+//     port_byte_out(0x3d4, 15); /* requesting low byte */
+//     position += port_byte_in(0x3d5);
+
+//     /* VGA 'cells' consist of the character and its control data
+//      * e.g. 'white on black background', 'red text on white bg', etc */
+//     int offset_from_vga = position * 2;
+
+//     /* Now you can examine both variables using gdb, since we still
+//      * don't know how to print strings on screen. Run 'make debug' and
+//      * on the gdb console:
+//      * breakpoint kernel.c:21
+//      * continue
+//      * print position
+//      * print offset_from_vga
+//      */
+
+//     /* Let's write on the current cursor position, we already know how
+//      * to do that */
+//     char *vga = (char*)0xb8000;
+//     vga[offset_from_vga] = 'X'; 
+//     vga[offset_from_vga+1] = 0x0f; /* White text on black background */
+
+// 	set_cur_xy(0,0);
+// 	char hello_str[]="Hello world!!!!!\n";
+// 	int hello_str_len = cstr_len(hello_str);
+// 	char search_pat[] ="world";
+// 	int search_pat_len = cstr_len(search_pat);
+	
+
+// 	char hello_str1[]="12345";
+// 	char new_line[]="\n";
+// 	int hello_str1_len = cstr_len(hello_str);
+
+// 	char buff[10]={0};
+
+
+
+// 	print_cstring(hello_str);
+// 	print_cstring(hello_str);
+// 	print_cstring(hello_str);
+
+// 	int find = search_array(
+// 		hello_str,
+// 		hello_str_len,
+// 		search_pat,
+// 		search_pat_len);
+
+// 	itoa(find,buff,10);
+// 	print_cstring(buff);
+// 	print_cstring(new_line);
+	
+// 	char empty []= "Empty!";
+
+// 	char * c = (char*)0x10000;
+// 	c[0] = 'T';
+// 	c[1] = 'e';
+// 	c[2] = 's';
+// 	c[3] = 't';
+// 	c[4] = '\0';
+	
+// 	char test[]="findme"; //finds this
+// 	int mem_pos = search_mem(test,5, 0x0, 0x100000);
+	
+
+	
+// 	// print_cstring(new_line);
+// 	itoa(mem_pos,buff,16);
+
+	
+// 	print_cstring(buff);
+// 	print_cstring(new_line);
+// 	print_cstring(test);
+// 	print_cstring(new_line);
+// 	print_cstring(test);
+// 	if(mem_pos >= 0)
+// 	{
+	
+// 		//((char*)mem_pos)[0]='E';
+	
+// 		print_cstring(new_line);
+// 		print_cstring((char*)mem_pos);
+// 	}
+// 	else{
+// 		print_cstring(empty);
+// 	}
+
+// 	print_cstring(new_line);
+// 	print_cstring("findme");
+// 	//print_cstring(new_line);
+
+// 	//print_memory(0x8ff82,64);
+
+// 	scroll_by_v2(24);
+// 	//set_cur_pos(get_cur_pos()-2*80);
+// 	// print_cstring(new_line);
+// 	// itoa(mem_pos,buff,16);
+
+// 	// print_cstring(buff);
+
+// 	// print_cstring("testa");
+	
+// 	// print_cstring("testc");
+// 	//print_cstring(test);
+	
+// 	// print_cstring_at(buff,0,0);
+
+// 	// zero_buff(buff,ITOA_BUFF_SIZE);
+
+// 	// len2 =itoa(len2,buff,16);
+ 
+// 	// print_cstring_at(buff,0,1);
+// 	//int len = 80*2*25;
+// 	//char zero[80*2*25 ]  = {};
+// 	//rep_stosb(zero,'a',len);
+// 	// memset(zero,80*2*25,'a');
+// 	// for(int i=0; i< 80*25;i++){
+// 	// 	zero[i*2 + 1] = 0x0f;
+// 	// }
+// 	// itoa((int)&zero[0],buff,16);
+// 	// rep_movsb(vga,zero,len);
+// 	// vga[0] = 'b';
+// 	// vga[1*2] = 'b';
+// 	// vga[1*2+1] = 0x0f;
+// 	// vga[2*2] = 'b';
+// 	// vga[2*2+1] = 0x0f;
+// 	//print_cstring(new_line);
+// 	//print_cstring(buff);
+// 	//print_cstring(new_line);
+
+// }

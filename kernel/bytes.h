@@ -9,8 +9,29 @@ void memset(char * c,int len, char val);
 extern  void rep_movsb(char *dst,char *src,int num);
 extern  void rep_stosb(char *dst,char byte,int num);
 
+void rep_movsb$loc(void *dst,void *src,int num);
+
 
 #ifdef KERNEL_BYTES_IMPLEMENTATION
+
+void rep_movsb$loc(void *dst,void *src,int num){
+	__asm__ 	(                                          
+	"cld\n\t"                                
+	"rep\n\t"                                
+	"movsb"                                  
+	:                                        
+	: "S" (src), "D" (dst), "c" (num)  
+	:   "memory"
+	);
+
+	// __asm__("cld ; rep movsb"
+	// 	 :
+	// 	 : "S"(src), "D"(dst), "c"(num) 
+	// 	 : "flags", "memory");
+
+		// asm(".intel_syntax noprefix");
+		// asm("mov eax, ebx");
+}
 
 void memset(char * c,int len, char val){
 	for(int i=0;i<len;i++)

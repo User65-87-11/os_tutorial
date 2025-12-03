@@ -11,6 +11,8 @@ rep_movsb:
 	mov edi, DWORD   [ebp + 8]
 	rep movsb
 	leave
+	;mov ecx,edx
+	rep movsb
 	ret
 
 
@@ -20,6 +22,7 @@ rep_stosb:
 	mov ecx, DWORD   [ebp + 16]
 	mov al, BYTE   [ebp + 12]
 	mov edi, DWORD   [ebp + 8]
+	; mov ecx,edx
 	rep stosb
 	leave
 	ret
