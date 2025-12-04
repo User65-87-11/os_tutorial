@@ -1,12 +1,14 @@
 #pragma once
 
 #include "../kernel/bytes.h"
-
+#include "ports.h"
 
 
 
 #define VGA_WIDTH  80
 #define VGA_HEIGHT  25
+
+
 
 
 
@@ -21,12 +23,35 @@ void set_cur_pos(int pos);
 void set_cur_xy(int x,int y);
 void scroll_by(int y);
 void scroll_by_v2(int y);
+void scroll_by_v3( int y);
 
 
 
 #ifdef DRIVERS_SCREEN_IMPLEMENTATION
 
 char *VGA_MEM = (char*)0xb8000;
+
+void scroll_by_v3( int y){
+	char buffer[VGA_WIDTH*VGA_HEIGHT*2] = {};
+	if( y <= 0 ) return;
+	if( y > VGA_HEIGHT)
+	{
+		y = VGA_HEIGHT ;
+	}
+	rep_movsb$loc(buffer,VGA_MEM,VGA_WIDTH*VGA_HEIGHT * 2);
+	int distance = y * VGA_WIDTH;
+	int cur_pos =	get_cur_pos();
+	int new_cur_pos = cur_pos - distance;
+	if(new_cur_pos < 0) 
+		new_cur_pos = 0;
+
+	int num = (VGA_WIDTH*VGA_HEIGHT - distance ) * 2;
+	rep_movsb$loc(VGA_MEM,&buffer[distance * 2],num);
+	
+	set_cur_pos(new_cur_pos);
+
+
+}
 
 void scroll_by_v2(int y){
 	char buffer[VGA_WIDTH*VGA_HEIGHT*2] = {};
@@ -37,7 +62,7 @@ void scroll_by_v2(int y){
 	if( y > VGA_HEIGHT)
 	{
 		y = VGA_HEIGHT;
-	}else if(y + VGA_HEIGHT < 0)
+	}else if(y + VGA_HEIGHT <= 0)
 	{
 		y= -VGA_HEIGHT;
 	}
@@ -78,7 +103,7 @@ void scroll_by_v2(int y){
 }
 
 void scroll_by(int y){
-	unsigned short VGA_BUFF[VGA_WIDTH*VGA_HEIGHT] = {};
+	
 	y = y % VGA_HEIGHT;
 	if( y == 0 ) return;
 	bool up = true;
@@ -162,13 +187,12 @@ void print_cstring_at(char *s,int x,int y){
 	}
 }
 void print_cstring(char * s){
-	unsigned short cur = get_cur_pos();
+	
 	
 	while(*s!='\0')
 	{
-		if(cur < VGA_WIDTH * VGA_HEIGHT)
-		{
-
+		unsigned short cur = get_cur_pos();
+		 
 			
 			if(*s == '\n'){
 				
@@ -181,9 +205,25 @@ void print_cstring(char * s){
 			
 			cur ++;
 			s++;	
-		}
+
+			set_cur_pos(cur);
+			if(cur < (VGA_HEIGHT * VGA_WIDTH))
+			{
+				
+			}else
+			{
+				scroll_by_v2(1);
+				//cur -= VGA_WIDTH;
+				//set_cur_pos(cur);
+			}
+			
+			
+		 
+			
+
+		 
 	}
-	set_cur_pos(cur);
+	
 }
 
 void clear_scr(){

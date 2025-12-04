@@ -12,8 +12,8 @@ rep_movsb:
 	rep movsb
 	leave
 	;mov ecx,edx
-	rep movsb
 	ret
+
 
 
 rep_stosb:

@@ -19,7 +19,7 @@ objects= $(BUILD_DIR)/kernel_entry.o \
 		$(BK_DIR)/kernel.o \
 		$(BK_DIR)/test.o \
 		$(BD_DIR)/ports.o \
-		$(BUILD_DIR)/asm/32bit-mem.o\
+		$(BUILD_DIR)/kernel/32bit-mem.o\
 		$(BCPU_DIR)/idt.o $(BCPU_DIR)/isr.o $(BCPU_DIR)/interrupt.o
 
 
@@ -30,7 +30,7 @@ objects= $(BUILD_DIR)/kernel_entry.o \
 
  
 
-all: echos init build_all
+all: echos init incs build_all
 	
 	
 build_all: $(BUILD_DIR)/bootsect.bin $(BUILD_DIR)/kernel.bin $(ZERO_FILE)
@@ -73,7 +73,13 @@ $(BCPU_DIR)/isr.o : $(CPU_DIR)/isr.c
 $(BCPU_DIR)/interrupt.o: $(CPU_DIR)/interrupt.asm
 	nasm $^ -f elf32 -o $@ 	
 
+# ------- asm inc  bin
 
+incs: $(BUILD_DIR)/kernel/inc.bin
+
+
+$(BUILD_DIR)/kernel/inc.bin: $(KERNEL_DIR)/inc.asm
+	nasm $^ -f bin -o $@
 
 # -------asm
 $(BUILD_DIR)/bootsect.bin: $(ASM_DIR)/boot_sect_main.asm
@@ -82,7 +88,7 @@ $(BUILD_DIR)/bootsect.bin: $(ASM_DIR)/boot_sect_main.asm
 $(BUILD_DIR)/kernel_entry.o: $(ASM_DIR)/kernel_entry.asm
 	nasm $^ -f elf32 -o $@ 
 
-$(BUILD_DIR)/asm/32bit-mem.o: $(ASM_DIR)/32bit-mem.asm
+$(BUILD_DIR)/kernel/32bit-mem.o: $(KERNEL_DIR)/32bit-mem.asm
 	nasm $^ -f elf32 -o $@ 
 
 
