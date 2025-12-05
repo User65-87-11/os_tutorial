@@ -8,11 +8,14 @@ void itoa32(int val,char * buff, int radix);//returns filled buffer and the new 
 
 extern  void mem_copy32(char *dst,char *src,int num);
 extern  void mem_set32(char *dst,char byte,int num);
+extern  void str_reverse32(char *dst,char byte,int num);
+extern  int str_len32(char *str);
+
 
 void rep_movsb32$loc(void *dst,void *src,int num);
 
 
-#ifdef KERNEL_BYTES_IMPLEMENTATION
+#ifdef STRINGS_IMPLEMENTATION
 
 void rep_movsb32$loc(void *dst,void *src,int num){
 	__asm__ 	(                                          
@@ -25,14 +28,8 @@ void rep_movsb32$loc(void *dst,void *src,int num){
 	);
 
 	 
- }
+}
 
-// void memset(char * c,int len, char val){
-// 	for(int i=0;i<len;i++)
-// 	{
-// 		c[i] = val;
-// 	}
-// }
 int search_array(char * str,int lensearch,char*bytes, int lenkey){
 	char *a;
 	char *b;

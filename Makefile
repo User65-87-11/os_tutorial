@@ -12,15 +12,15 @@ BD_DIR = build/drivers
 BCPU_DIR = build/cpu
 BA_DIR = build/asm
 CFLAGS = -g -std=c23 -m32
-LD_FLAGS = -m elf_i386
+LD_FLAGS = -m elf_i386 
 
 
 objects= $(BUILD_DIR)/kernel_entry.o \
 		$(BK_DIR)/kernel.o \
 		$(BK_DIR)/test.o \
-		$(BD_DIR)/ports.o \
+		$(BD_DIR)/ports.o $(BD_DIR)/keyboard.o \
 		$(BUILD_DIR)/kernel/32bit-mem.o\
-		$(BCPU_DIR)/idt.o $(BCPU_DIR)/isr.o $(BCPU_DIR)/interrupt.o
+		$(BCPU_DIR)/idt.o $(BCPU_DIR)/isr.o $(BCPU_DIR)/interrupt.o $(BCPU_DIR)/timer.o 
 
 
 .SILENT:make_objects
@@ -62,8 +62,14 @@ $(BK_DIR)/test.o: $(KERNEL_DIR)/test.c
 $(BD_DIR)/ports.o: $(DRIVER_DIR)/ports.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
+$(BD_DIR)/keyboard.o: $(DRIVER_DIR)/keyboard.c
+	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
-# --- IDT
+
+# --- 
+$(BCPU_DIR)/timer.o: $(CPU_DIR)/timer.c
+	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
+
 $(BCPU_DIR)/idt.o: $(CPU_DIR)/idt.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 

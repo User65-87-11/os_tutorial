@@ -9,9 +9,12 @@ CompileFlags:
     - "-Wno-pointer-to-int-cast"    
     - "-Wno-int-to-pointer-cast"    
 
-    - "-DKERNEL_BYTES_IMPLEMENTATION"
+    - "-DSTRINGS_IMPLEMENTATION"
     - "-DDRIVERS_SCREEN_IMPLEMENTATION" 
     - "-DPRINT_REGS_IMPLEMENTATION" 
+    - "-DDETECT_MEMORY_IMPLEMENTATION" 
+    
+    
     
     
 

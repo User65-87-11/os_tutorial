@@ -55,9 +55,9 @@ volatile void print_regs(){
 		((int *)string)[0] = 0;
 		((int *)string)[1] = 0;
 		
-		itoa(base[i],string,16);
+		itoa32(base[i],string,16);
 		
-		int len = cstr_len(string);
+		int len = str_len(string);
 		for(int a=0;a<8-len - 1;a++)
 		{
 			print_cstring("0");

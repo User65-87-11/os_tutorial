@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../kernel/bytes.h"
+
 #include "ports.h"
 
 
@@ -38,7 +39,7 @@ void scroll_by_v3( int y){
 	{
 		y = VGA_HEIGHT ;
 	}
-	rep_movsb$loc(buffer,VGA_MEM,VGA_WIDTH*VGA_HEIGHT * 2);
+	mem_copy32(buffer,VGA_MEM,VGA_WIDTH*VGA_HEIGHT * 2);
 	int distance = y * VGA_WIDTH;
 	int cur_pos =	get_cur_pos();
 	int new_cur_pos = cur_pos - distance;
@@ -46,100 +47,11 @@ void scroll_by_v3( int y){
 		new_cur_pos = 0;
 
 	int num = (VGA_WIDTH*VGA_HEIGHT - distance ) * 2;
-	rep_movsb$loc(VGA_MEM,&buffer[distance * 2],num);
+	mem_copy32(VGA_MEM,&buffer[distance * 2],num);
 	
 	set_cur_pos(new_cur_pos);
 
 
-}
-
-void scroll_by_v2(int y){
-	char buffer[VGA_WIDTH*VGA_HEIGHT*2] = {};
-
- 
-
-	if( y == 0 ) return;
-	if( y > VGA_HEIGHT)
-	{
-		y = VGA_HEIGHT;
-	}else if(y + VGA_HEIGHT <= 0)
-	{
-		y= -VGA_HEIGHT;
-	}
-	bool up = true;
-	int pos =	get_cur_pos() - y*VGA_WIDTH;
-	if(y < 0)
-	{
-		up = false;
-		y = y * -1;
-	}
-	rep_movsb$loc(buffer,VGA_MEM,VGA_WIDTH*VGA_HEIGHT * 2);
-	clear_scr();
-	int offset = y * 2 * VGA_WIDTH;
-	int num = VGA_WIDTH*VGA_HEIGHT * 2 - offset;
-	
-	 
-
-	if(up){
-		rep_movsb$loc(VGA_MEM,&buffer[offset],num);
-		 
-	}else
-	{
-		rep_movsb$loc(&VGA_MEM[offset],buffer,num);
-	}
-
-		
-
-
-	if(pos < 0)
-	{
-		pos = 0;
-	}
-	else if( pos >= VGA_WIDTH * VGA_HEIGHT)
-	{
-			pos = VGA_WIDTH * VGA_HEIGHT - 1;
-	}
-	set_cur_pos(pos);
-}
-
-void scroll_by(int y){
-	
-	y = y % VGA_HEIGHT;
-	if( y == 0 ) return;
-	bool up = true;
-	if(y < 0)
-	{
-		up = false;
-		y = y * -1;
-	}
-	unsigned short pos =	get_cur_pos();
- 
-	int offset = y * VGA_WIDTH * 2;
-	
-
-	if(up)
-	{		int num = VGA_WIDTH * VGA_HEIGHT * 2 - offset ;
-			rep_movsb(VGA_MEM,VGA_MEM + offset,num);//normal
-			pos = pos -  (y)*VGA_WIDTH ;
-	}else
-	{
-			int num =  offset ;
-			rep_movsb(VGA_MEM + offset ,VGA_MEM ,num);
-			pos = pos +  (y)*VGA_WIDTH ;
-	}
-
-
-	
-	
-	if(pos < 0)
-	{
-		pos = 0;
-	}
-	else if( pos >= VGA_WIDTH * VGA_HEIGHT)
-	{
-			pos = VGA_WIDTH * VGA_HEIGHT - 1;
-	}
-	set_cur_pos(pos);
 }
 
 
@@ -212,13 +124,10 @@ void print_cstring(char * s){
 				
 			}else
 			{
-				scroll_by_v2(1);
+				scroll_by_v3(1);
 				//cur -= VGA_WIDTH;
 				//set_cur_pos(cur);
 			}
-			
-			
-		 
 			
 
 		 
