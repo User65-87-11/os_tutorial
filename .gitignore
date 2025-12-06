@@ -3,3 +3,5 @@ docs/
 *.makefile
 test/
 .vscode/
+.ninja_log
+build.ninja*
