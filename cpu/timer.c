@@ -2,6 +2,8 @@
 #include "../drivers/screen.h"
 #include "types.h"
 #include "isr.h"
+#include "../libc/strings.h"
+
 
 u32 tick = 0;
 
@@ -13,7 +15,7 @@ static void timer_callback(registers_t regs) {
     char tick_ascii[15]={};
 
     itoa32(tick, tick_ascii,10);
-	int len = 6 + str_len(tick_ascii)+1;	
+	int len = 6 + str_len32(tick_ascii)+1;	
 
     print_cstring_at(tick_ascii,6,0);
     print_cstring_at(" ",len,0);

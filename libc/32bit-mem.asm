@@ -2,62 +2,66 @@ global mem_set32
 
 global mem_copy32
 
-global str_reverse32
+global mem_rev_copy32
 
 global str_len32
+global mem_compare32
+
+; stack is later in 64bit 
+; gcc
+; order f(edi,esi,edx,ecx,r8,r9, stack...)
+; edi, esi, edx, ecx, r8, r9  = gcc
+ 
 
 mem_copy32:
-	push ebp
-	mov ebp,esp
-	mov ecx, DWORD   [ebp + 16]
-	mov esi, DWORD   [ebp + 12]
-	mov edi, DWORD   [ebp + 8]
-	cld
-	rep movsb
-	leave
-	ret
+		mov ecx, edx
+		cld
+		rep movsb
+		ret
+
+mem_compare32:
+	; dst,src,src len ; 1 = true ; 0 =not true
+		mov eax, 1
+		mov ecx,edx
+		cld
+		repe cmpsb 
+	jz mem_compare_exit
+		mov eax,0
+	mem_compare_exit:
+		ret 
 
 
-global str_len32:
-	mov edi, DWORD   [ebp]
-	mov esi,edi
-	xor al, al
-	repne scasb
-	sub edi, esi
-	mov eax, edi
-	ret
 
 
-str_reverse32:
-		mov ecx, DWORD   [ebp + 12]
-		cmp ecx,0
-		jmp str_reverse32_exit
+str_len32:
+		mov esi,edi
+		xor al, al
+		repne scasb
+		sub edi,esi
+		dec edi
+		mov eax,edi
+		ret
 
-		mov esi, DWORD   [ebp + 8]
-		mov edi, DWORD   [ebp ]
-		add esi , ecx
+
+mem_rev_copy32:
+		cmp edx,0
+		je mem_rev_copy_exit
+		add esi , edx
 		dec esi 
-		
-
-str_reverse32_loop:
-	
-        mov dl, [esi]
-        mov [edi], dl
+	mem_rev_copy_loop:
+        mov cl, [esi]
+        mov [edi], cl
         dec esi
         inc edi
-		dec ecx
-        cmp ecx, 0
-        jg reverse32_loop
-str_reverse32_exit:
+		dec edx
+        cmp edx, 0
+        jg mem_rev_copy_loop
+	mem_rev_copy_exit:
         ret	
 
 mem_set32:
-	push ebp
-	mov ebp,esp
-	mov ecx, DWORD   [ebp + 16]
-	mov al, BYTE   [ebp + 12]
-	mov edi, DWORD   [ebp + 8]
-	cld
-	rep stosb
-	leave
-	ret
+		mov ecx, edx
+		mov al, [esi]  
+		cld
+		rep stosb
+		ret

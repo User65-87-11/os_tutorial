@@ -1,4 +1,4 @@
-#define KERNEL_BYTES_IMPLEMENTATION
+#define STRINGS_IMPLEMENTATION
 #define DRIVERS_SCREEN_IMPLEMENTATION
 #define PRINT_REGS_IMPLEMENTATION
 #define DETECT_MEMORY_IMPLEMENTATION
@@ -6,9 +6,11 @@
 #include "../drivers/keyboard.h"
 #include "../drivers/screen.h"
 #include "../cpu/timer.h"
+#include "../libc/strings.h"
+
 #include "detect_mem.h"
 
-#include "bytes.h"
+//#include "bytes.h"
 
 
 #include "../cpu/isr.h"
@@ -17,7 +19,7 @@
 
 
 
-int main() {
+void kernel_main() {
     isr_install();
     /* Test the interrupts */
 

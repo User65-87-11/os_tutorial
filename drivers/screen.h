@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../kernel/bytes.h"
+//#include "../kernel/bytes.h"
 
 #include "ports.h"
-
+#include "../libc/strings.h"
 
 
 #define VGA_WIDTH  80

@@ -1,7 +1,7 @@
 #pragma once
 #include "../drivers/screen.h"
-#include "../kernel/bytes.h"
-
+//#include "../kernel/bytes.h"
+#include "../libc/strings.h"
 
 volatile void print_regs();
 
@@ -57,7 +57,7 @@ volatile void print_regs(){
 		
 		itoa32(base[i],string,16);
 		
-		int len = str_len(string);
+		int len = str_len32(string);
 		for(int a=0;a<8-len - 1;a++)
 		{
 			print_cstring("0");

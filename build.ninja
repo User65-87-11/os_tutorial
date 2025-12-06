@@ -1,0 +1,23 @@
+#not for building
+rule nasm
+ command = nasm $in -f elf64 -o $out
+
+rule gcc
+ command = gcc  -std=c23  -g $in -o $out
+
+
+build test/test: gcc test/64bit-mem.o test/laa64.o test/test.c
+build test/64bit-mem.o: nasm test/64bit-mem.asm
+build test/laa64.o: nasm test/laa64.asm
+
+
+# test/test: test/64bit-mem.o test/laa64.o test/test.c
+# 	gcc  -std=c23  -g test/test.c test/64bit-mem.o test/laa64.o -o test/test
+
+# test/64bit-mem.o: test/64bit-mem.asm
+# 	nasm  test/64bit-mem.asm -f elf64 -o test/64bit-mem.o
+
+# test/laa64.o:test/laa64.asm 
+# 	nasm test/laa64.asm -f elf64 -o test/laa64.o
+
+

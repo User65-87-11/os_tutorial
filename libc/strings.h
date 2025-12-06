@@ -1,14 +1,15 @@
 #pragma once
 // #include "types.h"
 
+#include <stdint.h>
 
-int str_len(char * c);
-void itoa32(int val,char * buff, int radix);//returns filled buffer and the new length
+//int str_len(char * c);
+void itoa32(int32_t val,char * buff, uint32_t radix);//returns filled buffer and the new length
 // void memset(char * c,int len, char val);
 
 extern  void mem_copy32(char *dst,char *src,int num);
 extern  void mem_set32(char *dst,char byte,int num);
-extern  void str_reverse32(char *dst,char byte,int num);
+extern  void mem_rev_copy32(char *dst,char byte,int num);
 extern  int str_len32(char *str);
 
 
@@ -82,7 +83,7 @@ int search_mem(char * pattern, int p_len ,int start, int len){
 }
 
  
-void itoa32(int value,char * buff,int radix){
+void itoa32(int32_t value,char * buff,uint32_t radix){
 	#define ITOA_BUFF_SIZE 14
 
 	int val;
@@ -126,9 +127,9 @@ void itoa32(int value,char * buff,int radix){
 }
 
  
-int str_len(char *c){
-	int l = 0;
-	while(c[l++] != '\0');
-	return l;
-}
+// int str_len(char *c){
+// 	int l = 0;
+// 	while(c[l++] != '\0');
+// 	return l;
+// }
 #endif

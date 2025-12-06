@@ -5,22 +5,24 @@ KERNEL_DIR = kernel
 DRIVER_DIR = drivers
 ASM_DIR = asm
 CPU_DIR = cpu
+LIBC_DIR = libc
 ZERO_FILE = build/zero_mb.dat
 
-BK_DIR = build/kernel
-BD_DIR = build/drivers
-BCPU_DIR = build/cpu
-BA_DIR = build/asm
+BLD_KRN_DIR = build/kernel
+BLD_DRV_DIR = build/drivers
+BLD_CPU_DIR = build/cpu
+BLD_ASM_DIR = build/asm
+BLD_LIBC_DIR = build/libc
+
 CFLAGS = -g -std=c23 -m32
 LD_FLAGS = -m elf_i386 
 
 
 objects= $(BUILD_DIR)/kernel_entry.o \
-		$(BK_DIR)/kernel.o \
-		$(BK_DIR)/test.o \
-		$(BD_DIR)/ports.o $(BD_DIR)/keyboard.o \
-		$(BUILD_DIR)/kernel/32bit-mem.o\
-		$(BCPU_DIR)/idt.o $(BCPU_DIR)/isr.o $(BCPU_DIR)/interrupt.o $(BCPU_DIR)/timer.o 
+		$(BLD_KRN_DIR)/kernel.o $(BLD_KRN_DIR)/test.o \
+		$(BLD_DRV_DIR)/ports.o $(BLD_DRV_DIR)/keyboard.o \
+		$(BLD_LIBC_DIR)/32bit-mem.o\
+		$(BLD_CPU_DIR)/idt.o $(BLD_CPU_DIR)/isr.o $(BLD_CPU_DIR)/interrupt.o $(BLD_CPU_DIR)/timer.o 
 
 
 .SILENT:make_objects
@@ -30,7 +32,7 @@ objects= $(BUILD_DIR)/kernel_entry.o \
 
  
 
-all: echos init incs build_all
+all: echos  init  build_all
 	
 	
 build_all: $(BUILD_DIR)/bootsect.bin $(BUILD_DIR)/kernel.bin $(ZERO_FILE)
@@ -45,47 +47,48 @@ clean:
 
 init:
 	@echo "-----------INIT------------"
-	mkdir -p $(BK_DIR)
-	mkdir -p $(BD_DIR)
-	mkdir -p $(BA_DIR)
-	mkdir -p $(BCPU_DIR)
+	mkdir -p $(BLD_CPU_DIR)
+	mkdir -p $(BLD_DRV_DIR)
+	mkdir -p $(BLD_ASM_DIR)
+	mkdir -p $(BLD_KRN_DIR)
+	mkdir -p $(BLD_LIBC_DIR)
 	dd if=/dev/zero of=$(ZERO_FILE) bs=1MB count=1
 
 
 
-$(BK_DIR)/kernel.o: $(KERNEL_DIR)/kernel.c
+$(BLD_KRN_DIR)/kernel.o: $(KERNEL_DIR)/kernel.c
 	gcc $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
-$(BK_DIR)/test.o: $(KERNEL_DIR)/test.c
+$(BLD_KRN_DIR)/test.o: $(KERNEL_DIR)/test.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
-$(BD_DIR)/ports.o: $(DRIVER_DIR)/ports.c
+$(BLD_DRV_DIR)/ports.o: $(DRIVER_DIR)/ports.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
-$(BD_DIR)/keyboard.o: $(DRIVER_DIR)/keyboard.c
+$(BLD_DRV_DIR)/keyboard.o: $(DRIVER_DIR)/keyboard.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
 
 # --- 
-$(BCPU_DIR)/timer.o: $(CPU_DIR)/timer.c
+$(BLD_CPU_DIR)/timer.o: $(CPU_DIR)/timer.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
-$(BCPU_DIR)/idt.o: $(CPU_DIR)/idt.c
+$(BLD_CPU_DIR)/idt.o: $(CPU_DIR)/idt.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
-$(BCPU_DIR)/isr.o : $(CPU_DIR)/isr.c
+$(BLD_CPU_DIR)/isr.o : $(CPU_DIR)/isr.c
 	gcc  $(CFLAGS) -ffreestanding -fno-pie -c $^ -o $@
 
-$(BCPU_DIR)/interrupt.o: $(CPU_DIR)/interrupt.asm
+$(BLD_CPU_DIR)/interrupt.o: $(CPU_DIR)/interrupt.asm
 	nasm $^ -f elf32 -o $@ 	
 
 # ------- asm inc  bin
 
-incs: $(BUILD_DIR)/kernel/inc.bin
+# incs: $(BUILD_DIR)/kernel/inc.bin
 
 
-$(BUILD_DIR)/kernel/inc.bin: $(KERNEL_DIR)/inc.asm
-	nasm $^ -f bin -o $@
+# $(BUILD_DIR)/kernel/inc.bin: $(KERNEL_DIR)/inc.asm
+# 	nasm $^ -f bin -o $@
 
 # -------asm
 $(BUILD_DIR)/bootsect.bin: $(ASM_DIR)/boot_sect_main.asm
@@ -94,7 +97,7 @@ $(BUILD_DIR)/bootsect.bin: $(ASM_DIR)/boot_sect_main.asm
 $(BUILD_DIR)/kernel_entry.o: $(ASM_DIR)/kernel_entry.asm
 	nasm $^ -f elf32 -o $@ 
 
-$(BUILD_DIR)/kernel/32bit-mem.o: $(KERNEL_DIR)/32bit-mem.asm
+$(BLD_LIBC_DIR)/32bit-mem.o: $(LIBC_DIR)/32bit-mem.asm
 	nasm $^ -f elf32 -o $@ 
 
 
